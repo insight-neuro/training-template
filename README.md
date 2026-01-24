@@ -10,7 +10,7 @@ This is a template repository for training machine learning models for neural da
    uv sync  # if not using uv, use: pip install -e .[dev] with a virtual environment
    ```
 
-2. Download the [Braintree Bank dataset](https://braintreebank.dev/) using the provided SLURM script (`scripts/braintreebank.sh`) or manually, and update your `.env` file with the path to the dataset:
+2. Download the [Braintree Bank dataset](https://braintreebank.dev/) (~130 GB) using the provided SLURM script (`scripts/braintreebank.sh`) or manually, and update your `.env` file with the path to the dataset:
 
    ```
    DATA_ROOT_DIR=/path/to/braintree_bank_dataset
