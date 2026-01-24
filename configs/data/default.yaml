@@ -1,4 +1,22 @@
-# @package data
-# Data loading and preprocessing settings
-data_path: "data/"
-cache_dir: "cache/"
+train_subject_trials: # Format: "dataset_identifier/subject_identifier/session_identifier[time_from:time_to]"
+- "vanblooijs_hermes_developmental_2023/sub-ccepAgeUMCU0*/*"
+- "vanblooijs_hermes_developmental_2023/sub-ccepAgeUMCU1*/*"
+- "braintreebank/*/*"
+# - "*/*/*"
+
+batch_size: 128
+context_length: ${.model.context_length}
+
+rereference: false
+max_n_electrodes: 96
+
+sampler:
+  batch_size: 128
+  shuffle: false
+  drop_last: true
+
+dataloader:
+  pin_memory: true
+  persistent_workers: true
+  num_workers: 4
+  prefetch_factor: 2

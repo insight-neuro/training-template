@@ -1,6 +1,6 @@
 # Train Template
 
-This is a template repository for training machine learning models for neural data using PyTorch Lightning. It provides a structured setup for data handling, model definition, and training processes.
+This is a template repository for training machine learning models for neural data using PyTorch Lightning. It implements a simple next-token prediction model on the Braintree Bank dataset, allowing for easy customization and extension with a structured setup for data handling, model definition, and training processes.
 
 ## Quick Start
 
@@ -10,18 +10,25 @@ This is a template repository for training machine learning models for neural da
    uv sync  # if not using uv, use: pip install -e .[dev]
    ```
 
-2. Modify the model, train logic, and configuration files as needed.
+2. Download the [Braintree Bank dataset](https://braintreebank.dev/) and update your `.env` file with the path to the dataset:
 
-3. Run the training script:
+   ```
+   DATA_ROOT_DIR=/path/to/braintree_bank_dataset
+   ```
+
+3. Modify the model, train logic, and configuration files as needed (see below).
+
+4. Run the training script:
 
    ```bash
-   uv run -m src.train  # if not using uv, use: python -m src.train
+   uv run -m train  # if not using uv, use: python -m train
    ```
 
 ## Repository Structure
 
 - `configs/`: Contains configuration files for different training setups. We use [Hydra](https://hydra.cc/) for configuration management, allowing easy CLI overrides and organization.
-- `src/`: Contains the source code for data modules, models, and training scripts.
-  - `models/`: Model definitions using PyTorch Lightning.
-  - `utils/`: Utility functions for data processing and logging.
+- `train/`: Contains the source code for data modules, models, and training scripts.
+  - `model.py`: Model architecture.
+  - `pl_module.py`: PyTorch Lightning module that wraps the model and defines training/validation steps.
+  - `dataset.py`: Data loading and preprocessing. You can probably ignore this for now.
   - `train.py`: The main training script that orchestrates the training process.

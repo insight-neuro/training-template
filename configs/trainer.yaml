@@ -1,0 +1,11 @@
+# @package trainer
+max_epochs: 100
+
+precision: bf16-mixed
+accelerator: "auto"
+devices: 1
+log_every_n_steps: 1  # Log every batch
+gradient_clip_val: 1.0
+deterministic: True
+enable_progress_bar: False  # Disable messy progress bar
+enable_model_summary: True

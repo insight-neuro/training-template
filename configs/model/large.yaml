@@ -1,5 +1,7 @@
-# @package model
-# @override model/default
+defaults:
+ - default
+ - _self_
+
 transformer:
   d_model: 512
   n_heads: 16

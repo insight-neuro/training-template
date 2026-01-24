@@ -38,6 +38,12 @@ coverage.xml
 *.cover
 *.log
 
+# Cache files
+*_cache
+
+# Lock files
+*.lock
+
 # Environment variables
 .env
 

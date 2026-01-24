@@ -1,12 +1,14 @@
-# @package _global_
 defaults:
-  - model: default
-  - training: default
   - cluster: default
   - data: default
+  - model: default
+  - optim: adamw
+  - trainer
+  - spectrogram
   - _self_
 
-# Global settings
+seed: 42
+
 hydra:
   run:
     dir: outputs/${now:%Y-%m-%d_%H-%M-%S}
@@ -25,10 +27,3 @@ hydra:
         stream: ext://sys.stdout
     root:
       handlers: [console]
-
-
-# Override any settings here if needed
-# For example:
-# model:
-#   transformer:
-#     d_model: 256
