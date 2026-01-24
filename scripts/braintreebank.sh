@@ -4,8 +4,8 @@
 
 #SBATCH --job-name=braintreebank
 #SBATCH --output=logs/%x_%j.out
-#SBATCH --error=logs/%x_%j.error
-#SBATCH --time=01:00:00
+#SBATCH --error=logs/%x_%j.err
+#SBATCH --time=04:00:00
 #SBATCH --cpus-per-task=16
 #SBATCH --mem-per-cpu=4G
 
@@ -18,7 +18,7 @@ module load eth_proxy  # Replace this if not on ETH Zurich cluster
 # Optional root dir (default: SCRATCH if set, otherwise cwd)
 ROOT_DIR="${1:-${SCRATCH:-$(pwd)}}"
 
-BASE_URL="https://braintreebank.dev/data"
+BASE_URL="https://braintreebank.dev/data/"
 ZIP_DIR="$ROOT_DIR/braintreebank_temp"
 OUT_DIR="$ROOT_DIR/braintreebank"
 

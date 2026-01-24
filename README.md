@@ -24,6 +24,12 @@ This is a template repository for training machine learning models for neural da
    uv run -m train  # if not using uv, use: python -m train
    ```
 
+   or if using SLURM:
+
+   ```bash
+   sbatch scripts/train.sh [CLI overrides]
+   ```
+
 ## Repository Structure
 
 - `configs/`: Contains configuration files for different training setups. We use [Hydra](https://hydra.cc/) for configuration management, allowing easy CLI overrides and organization.
@@ -34,3 +40,4 @@ This is a template repository for training machine learning models for neural da
   - `train.py`: The main training script that orchestrates the training process.
 - `scripts/`: Scripts to run on a SLURM cluster. May need to be adjusted to your cluster configuration.
    - `braintreebank.sh`: SLURM script to download and prepare the Braintree Bank dataset.
+   - `train.sh`: SLURM script to run training jobs. CLI arguments can be passed to override config options.
