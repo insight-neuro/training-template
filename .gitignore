@@ -13,6 +13,9 @@ ENV/
 # Hydra
 outputs/
 
+# Logs
+logs/
+
 # Distribution / packaging
 build/
 dist/
