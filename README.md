@@ -10,18 +10,18 @@ This is a template repository for training machine learning models for neural da
    uv sync  # if not using uv, use: pip install -e .[dev] with a virtual environment
    ```
 
-2. Download the [Braintree Bank dataset](https://braintreebank.dev/) (~130 GB) using the provided SLURM script (`scripts/braintreebank.sh`) or manually, and update your `.env` file with the path to the dataset:
+2. Download the [Braintree Bank dataset](https://braintreebank.dev/) (~130 GB) using the provided SLURM script (`scripts/data.sh`) or manually, and update your `.env` file with the path to the dataset. Note you may need to adjust the script and `scripts/env.sh` to fit your cluster setup.
 
    ```
-   DATA_ROOT_DIR=/path/to/braintree_bank_dataset
+   ROOT_DIR=/path/to/braintree_bank_dataset
    ```
 
-3. Modify the model, train logic, and configuration files as needed (see below).
+3. Modify the model, training logic, and configuration files as needed (see below).
 
 4. Run the training script:
 
    ```bash
-   uv run -m train  # if not using uv, use: python -m train
+   uv run -m train [CLI overrides]  # if not using uv, use: python -m train
    ```
 
    or if using SLURM:
@@ -39,5 +39,5 @@ This is a template repository for training machine learning models for neural da
   - `dataset.py`: Data loading and preprocessing. You can probably ignore this for now.
   - `train.py`: The main training script that orchestrates the training process.
 - `scripts/`: Scripts to run on a SLURM cluster. May need to be adjusted to your cluster configuration.
-   - `braintreebank.sh`: SLURM script to download and prepare the Braintree Bank dataset.
+   - `data.sh`: SLURM script to download and prepare the Braintree Bank dataset using `ieeg-data`.
    - `train.sh`: SLURM script to run training jobs. CLI arguments can be passed to override config options.

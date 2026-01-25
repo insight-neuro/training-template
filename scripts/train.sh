@@ -9,12 +9,7 @@
 #SBATCH --time=24:00:00
 #SBATCH --mail-type=END,FAIL
 
-module load stack/2024-06 gcc/12.2.0 python/3.13.0 cuda/12.8.0 eth_proxy
-
-if ! command -v uv &> /dev/null then
-    echo "uv could not be found, installing..."
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-fi
+source scripts/env.sh
 
 echo "Starting training job at $(date)"
 

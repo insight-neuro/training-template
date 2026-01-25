@@ -25,9 +25,9 @@ class iEEGDataModule(pl.LightningDataModule):
     def __init__(self, cfg: DictConfig, root_dir: str | None = None):
         super().__init__()
         self.cfg = cfg
-        self.root_dir = root_dir or os.environ["DATA_ROOT_DIR"]
-        if not root_dir and "DATA_ROOT_DIR" not in os.environ:
-            raise ValueError("DATA_ROOT_DIR environment variable not set and no root_dir provided.")
+        self.root_dir = root_dir or os.environ["ROOT_DIR"]
+        if not root_dir and "ROOT_DIR" not in os.environ:
+            raise ValueError("ROOT_DIR environment variable not set and no root_dir provided.")
 
         self.train_dataset = None
         self.val_dataset = None
