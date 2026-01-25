@@ -3,11 +3,17 @@ defaults:
   - data: default
   - model: default
   - optim: adamw
+  - preprocess: spectrogram
   - trainer
-  - spectrogram
   - _self_
 
 seed: 42
+
+# Weights & Biases configuration
+wandb_project: "train-bfm"
+wandb_entity: ""
+
+save_model_every_n_epochs: 1
 
 hydra:
   run:

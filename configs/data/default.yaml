@@ -7,9 +7,6 @@ train_subject_trials: # Format: "dataset_identifier/subject_identifier/session_i
 batch_size: 128
 context_length: ${.model.context_length}
 
-rereference: false
-max_n_electrodes: 96
-
 sampler:
   batch_size: 128
   shuffle: false

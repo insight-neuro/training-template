@@ -1,0 +1,11 @@
+rereference: false
+max_n_electrodes: 96
+
+spectrogram:
+  _target_: crane.preprocessing.Spectrogram
+  min_frequency: 0
+  max_frequency: 250
+  tperseg: 0.25
+  poverlap: 0.75
+  window: hann
+  remove_line_noise: True

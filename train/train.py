@@ -16,18 +16,16 @@ from train.dataset import iEEGDataModule
 from train.model import iEEGTransformer
 from train.pl_module import BFMLightning
 
+logger = logging.getLogger(__name__)
+
 
 @hydra.main(version_base="1.3", config_path="../configs", config_name="config")
 def train(cfg: DictConfig):
-    logger = logging.getLogger(__name__)
     hydra_wd = HydraConfig.get().runtime.output_dir
 
     # Set random seed for reproducibility
     cfg.seed = cfg.get("seed", 42)
     seed_everything(cfg.seed)
-
-    # Print configuration
-    logger.info("=" * 80 + "\nConfiguration:\n" + OmegaConf.to_yaml(cfg) + "=" * 80)
 
     # Initialize data module
     logger.info("Initializing data module...")
@@ -52,7 +50,7 @@ def train(cfg: DictConfig):
             mode="min",
             save_top_k=3,
             save_last=True,
-            every_n_epochs=cfg.cluster.save_model_every_n_epochs,
+            every_n_epochs=cfg.save_model_every_n_epochs,
         )
     ]
 
@@ -61,19 +59,19 @@ def train(cfg: DictConfig):
     logger.info(f"CSV logging enabled: {hydra_wd}/logs/training_logs")
 
     # WandB Logger (optional)
-    if cfg.cluster.wandb_project and cfg.cluster.wandb_entity:
+    if cfg.wandb_project and cfg.wandb_entity:
         wandb_logger = WandbLogger(
-            project=cfg.cluster.wandb_project,
-            entity=cfg.cluster.wandb_entity,
+            project=cfg.wandb_project,
+            entity=cfg.wandb_entity,
             name=cfg.get("run_name"),
             save_dir=hydra_wd,
             config=OmegaConf.to_container(cfg, resolve=True),
         )
         loggers.append(wandb_logger)
-        logger.info(f"W&B logging enabled: {cfg.cluster.wandb_entity}/{cfg.cluster.wandb_project}")
+        logger.info(f"W&B logging enabled: {cfg.wandb_entity}/{cfg.wandb_project}")
     else:
         callbacks += [DeviceStatsMonitor(), LearningRateMonitor(logging_interval="step")]
-        logger.info("W&B logging disabled (wandb_project and wandb_entity are empty)")
+        logger.info("W&B logging disabled: (wandb_project or wandb_entity are empty)")
 
     # Initialize Lightning module
     module = BFMLightning(cfg, model)
