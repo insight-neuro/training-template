@@ -13,8 +13,8 @@ source scripts/env.sh
 
 DATASET=wang_barbu_braintreebank_2023
 
-RAW_DIR="$ROOT_DIR/braintreebank_raw"
-OUT_DIR="$ROOT_DIR/braintreebank"
+RAW_DIR="$ROOT_DIR/bfm/raw"
+OUT_DIR="$ROOT_DIR/bfm"
 
 IEEG_DATA=git+https://github.com/insight-neuro/ieeg-data
 
@@ -30,7 +30,7 @@ export UV_NO_CONFIG=1
 
 # Use ieeg-data to process data
 uvx --from "$IEEG_DATA" ieeg-data prepare "$DATASET" \
-    --raw-dir "$RAW_DIR" --processed-dir "$OUT_DIR"
+    --raw-dir "$RAW_DIR/$DATASET" --processed-dir "$OUT_DIR"
 
 echo "Processed data saved to $OUT_DIR at $(date). Removing raw data."
 

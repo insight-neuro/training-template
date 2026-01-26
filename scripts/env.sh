@@ -9,7 +9,6 @@ mkdir -p logs
 
 export ROOT_DIR="${SCRATCH:-$(pwd)}/bfm"
 export HF_HOME="$ROOT_DIR/.hf/"
-export UV_CACHE_DIR="$ROOT_DIR/.uv/"
 export UV_PROJECT_ENVIRONMENT="$ROOT_DIR/.venv"
 
 module load stack/2024-06 gcc/12.2.0 python/3.12.8 cuda/12.8.0 eth_proxy
