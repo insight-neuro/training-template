@@ -10,12 +10,18 @@ from transformers import LlamaConfig, LlamaModel
 
 
 class iEEGTransformer(BrainModel):
-    def __init__(self, cfg: DictConfig):
-        self.signal_projection = nn.Linear(cfg.input_dim, cfg.transformer.d_model)
-        max_position_embeddings = math.ceil(cfg.context_length / cfg.signal_preprocessing.segment_length / (1 - cfg.signal_preprocessing.p_overlap))
+    """Transformer model for intracranial EEG (iEEG) data using LLaMA architecture with RoPE.
+
+    Args:
+        cfg: Configuration dictionary for the model.
+        input_dim: Dimensionality of the input features (e.g., number of frequency bins).
+    """
+
+    def __init__(self, cfg: DictConfig, input_dim: int):
+        max_position_embeddings = math.ceil(cfg.context_length / cfg.segment_length / (1 - cfg.p_overlap))
         rope_theta = max_position_embeddings * 2 * np.pi
 
-        # # LLaMA uses RoPE by default on the sequence dimension
+        # LLaMA uses RoPE by default on the sequence dimension
         llama_config = LlamaConfig(
             hidden_size=cfg.transformer.d_model,
             num_hidden_layers=cfg.transformer.n_layers,
@@ -26,12 +32,14 @@ class iEEGTransformer(BrainModel):
             hidden_dropout_prob=cfg.dropout,
             attention_dropout=cfg.dropout,
         )
+
+        super().__init__(llama_config)
+
+        self.signal_projection = nn.Linear(input_dim, cfg.transformer.d_model)
         self.transformer = LlamaModel(llama_config)
 
         # Task-specific head (e.g., classification, regression, etc.)
-        self.output_head = nn.Linear(cfg.transformer.d_model, cfg.input_dim)
-
-        super().__init__(llama_config)
+        self.output_head = nn.Linear(cfg.transformer.d_model, input_dim)
 
     def forward(self, x: torch.Tensor) -> BrainOutput:
         """

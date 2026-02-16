@@ -1,11 +1,12 @@
+_target_: train.featurizer.iEEGPreprocessor
 rereference: false
 max_n_electrodes: 96
 
 spectrogram:
-  _target_: crane.preprocessing.Spectrogram
+  _target_: crane.preprocess.Spectrogram
+  segment_length: 0.25
+  p_overlap: 0.75
   min_frequency: 0
   max_frequency: 250
-  tperseg: 0.25
-  poverlap: 0.75
   window: hann
   remove_line_noise: True

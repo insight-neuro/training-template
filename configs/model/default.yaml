@@ -2,10 +2,9 @@ transformer:
   d_model: 192
   n_heads: 12
   n_layers: 5
-  dropout: 0.1
 
-input_dim: ${..spectrogram.n_freqs}
+dropout: 0.1
 context_length: 3.0  # seconds
-segment_length: 0.25  # seconds
-p_overlap: 0.75
+segment_length: ${preprocess.spectrogram.segment_length}
+p_overlap: ${preprocess.spectrogram.p_overlap}
 

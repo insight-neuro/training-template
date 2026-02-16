@@ -1,19 +1,20 @@
-train_subject_trials: # Format: "dataset_identifier/subject_identifier/session_identifier[time_from:time_to]"
-- "vanblooijs_hermes_developmental_2023/sub-ccepAgeUMCU0*/*"
-- "vanblooijs_hermes_developmental_2023/sub-ccepAgeUMCU1*/*"
-- "braintreebank/*/*"
-# - "*/*/*"
-
 batch_size: 128
-context_length: ${.model.context_length}
+context_length: ${model.context_length}
 
-sampler:
-  batch_size: 128
-  shuffle: false
-  drop_last: true
+# Rest will be used for training. Pass a comma-separated list of subject IDs to use for evaluation.
+eval_subjects: [10]
+
+train_ds:
+  _target_: crane.data.CraneDataset
+  dataset_dir: ${oc.env:ROOT_DIR}/wang_barbu_braintreebank_2023
+
+eval_ds:
+  _target_: crane.data.CraneDataset
+  dataset_dir: ${oc.env:ROOT_DIR}/wang_barbu_braintreebank_2023
 
 dataloader:
   pin_memory: true
+  batch_size: 128
   persistent_workers: true
   num_workers: 4
   prefetch_factor: 2

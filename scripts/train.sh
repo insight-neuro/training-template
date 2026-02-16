@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #SBATCH --job-name=train
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err

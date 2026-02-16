@@ -9,17 +9,21 @@ defaults:
 
 seed: 42
 
+name: ${oc.env:SLURM_JOB_NAME}_${oc.env:SLURM_JOB_ID}
+
 # Weights & Biases configuration
-wandb_project: "train-bfm"
-wandb_entity: ""
+wandb:
+  name: ${name}
+  project: "train-bfm"
+  entity: ""
 
 save_model_every_n_epochs: 1
 
 hydra:
   run:
-    dir: outputs/${now:%Y-%m-%d_%H-%M-%S}
+    dir: outputs/${name}
   job:
-    name: ${training.setup_name}
+    name: ${name}
   job_logging:
     level: INFO
     formatters:

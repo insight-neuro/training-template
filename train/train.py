@@ -2,6 +2,7 @@ import logging
 
 import hydra
 from hydra.core.hydra_config import HydraConfig
+from hydra.utils import instantiate
 from lightning.pytorch import Trainer, seed_everything
 from lightning.pytorch.callbacks import (
     Callback,
@@ -12,7 +13,7 @@ from lightning.pytorch.callbacks import (
 from lightning.pytorch.loggers import CSVLogger, Logger, WandbLogger
 from omegaconf import DictConfig, OmegaConf
 
-from train.dataset import iEEGDataModule
+from train.datamodule import DataModule
 from train.model import iEEGTransformer
 from train.pl_module import BFMLightning
 
@@ -29,11 +30,15 @@ def train(cfg: DictConfig):
 
     # Initialize data module
     logger.info("Initializing data module...")
-    datamodule = iEEGDataModule(cfg)
+    datamodule = DataModule(cfg.data)
+
+    # Initialize featurizer
+    logger.info("Setting up featurizer...")
+    featurizer = instantiate(cfg.preprocess)
 
     # Initialize model
     logger.info("Initializing model...")
-    model = iEEGTransformer(cfg.model)
+    model = iEEGTransformer(cfg.model, input_dim=featurizer.feature_size)
 
     # Count parameters
     n_params = sum(p.numel() for p in model.parameters())
@@ -59,22 +64,22 @@ def train(cfg: DictConfig):
     logger.info(f"CSV logging enabled: {hydra_wd}/logs/training_logs")
 
     # WandB Logger (optional)
-    if cfg.wandb_project and cfg.wandb_entity:
+    if cfg.wandb and cfg.wandb.project and cfg.wandb.entity:
         wandb_logger = WandbLogger(
-            project=cfg.wandb_project,
-            entity=cfg.wandb_entity,
-            name=cfg.get("run_name"),
             save_dir=hydra_wd,
             config=OmegaConf.to_container(cfg, resolve=True),
+            **cfg.wandb,
         )
         loggers.append(wandb_logger)
-        logger.info(f"W&B logging enabled: {cfg.wandb_entity}/{cfg.wandb_project}")
+
+        run = wandb_logger.experiment
+        logger.info(f"W&B logging enabled: {run.name} at {run.entity}/{run.project} (id={run.id})")
     else:
         callbacks += [DeviceStatsMonitor(), LearningRateMonitor(logging_interval="step")]
-        logger.info("W&B logging disabled: (wandb_project or wandb_entity are empty)")
+        logger.info("W&B logging disabled: (wandb not set in config.)")
 
     # Initialize Lightning module
-    module = BFMLightning(cfg, model)
+    module = BFMLightning(cfg, featurizer, model)
     trainer = Trainer(
         callbacks=callbacks,
         logger=loggers,

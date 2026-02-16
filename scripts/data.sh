@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Script to download and extract the Brain Treebank dataset.
+# Script to download and extract multiple Brainsets.
 # Run as: sbatch scripts/data.sh
 
-#SBATCH --job-name=braintreebank
+#SBATCH --job-name=data
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 #SBATCH --time=04:00:00
@@ -11,31 +11,36 @@
 
 source scripts/env.sh
 
-DATASET=wang_barbu_braintreebank_2023
-
-RAW_DIR="$ROOT_DIR/bfm/raw"
-OUT_DIR="$ROOT_DIR/bfm"
-
-IEEG_DATA=git+https://github.com/insight-neuro/ieeg-data
-
-echo "Downloading and processing Brain Treebank dataset at $(date)"
-
-# Use ieeg-data to download
-uvx --from "$IEEG_DATA" ieeg-data download "$DATASET" \
-    --raw-dir "$RAW_DIR" --num_procs 8
-
-echo "Download completed at $(date). Beginning processing."
-
 export UV_NO_CONFIG=1
 
-# Use ieeg-data to process data
-uvx --from "$IEEG_DATA" ieeg-data prepare "$DATASET" \
-    --raw-dir "$RAW_DIR/$DATASET" --processed-dir "$OUT_DIR"
+RAW_DIR="$ROOT_DIR/raw"
+OUT_DIR="$ROOT_DIR"
 
-echo "Processed data saved to $OUT_DIR at $(date). Removing raw data."
+# Use insight-neuro's fork of brainsets to access the datasets
+BRAINSETS=git+https://github.com/insight-neuro/brainsets
 
-# Delete raw data to save space
+echo "Processing Brainsets at $(date)"
+
+# List of datasets to process
+DATASETS=(
+    wang_barbu_braintreebank_2023
+    # add more brainsets here
+)
+
+# Use brainsets to download and prepare each dataset
+for DATASET in "${DATASETS[@]}"; do
+
+    uvx --from "$BRAINSETS" brainsets prepare "$DATASET" \
+        --raw-dir "$RAW_DIR" --processed-dir "$OUT_DIR"
+
+        if [ $? -ne 0 ]; then
+        echo "Error processing $DATASET. Exiting."
+        exit 1
+    fi
+done
+
+# Delete raw data to save storage space
 rm -rf "$RAW_DIR"
-
-echo "Brain Treebank dataset preparation completed at $(date)."
+    
+echo "Dataset preparation completed at $(date)."
 echo "Data available at $OUT_DIR."
