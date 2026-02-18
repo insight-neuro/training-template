@@ -44,15 +44,18 @@ class iEEGTransformer(BrainModel):
     def forward(self, x: torch.Tensor) -> BrainOutput:
         """
         Args:
-            x: [batch_size, num_electrodes, num_timesamples]
+            x: [batch_size, num_electrodes, num_timesamples, num_frequencies]
+            
+        Returns:
+            BrainOutput containing the last hidden state of the transformer.
         """
-        batch_size, num_electrodes, num_timebins = x.shape
+        batch_size, num_electrodes, num_timebins, _ = x.shape
 
         # Project signal values
         signal_emb = self.signal_projection(x)  # [batch_size, num_electrodes, num_timebins, d_model]
         position_ids = torch.arange(num_timebins, device=signal_emb.device).unsqueeze(0).unsqueeze(0).expand(batch_size, num_electrodes, num_timebins)
 
-        # Option 1: Flatten to [B, N*M, d_model] - attend across all electrode-time pairs
+        # Flatten to [B, N*M, d_model] - attend across all electrode-time pairs
         signal_emb = signal_emb.reshape(batch_size, num_electrodes * num_timebins, -1)  # [batch_size, num_electrodes * num_timebins, d_model]
         position_ids = position_ids.reshape(batch_size, num_electrodes * num_timebins)
         outputs = self.transformer(inputs_embeds=signal_emb, position_ids=position_ids)  # [batch_size, num_electrodes * num_timebins, d_model]

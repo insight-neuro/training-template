@@ -1,8 +1,8 @@
 import logging
 
 import lightning.pytorch as pl
-from crane.data import Subjects
-from hydra.utils import instantiate
+from crane import BrainFeatureExtractor
+from crane.data import CraneDataset, Subjects
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 from torch_brain.data import collate
@@ -16,18 +16,18 @@ class DataModule(pl.LightningDataModule):
 
     Args:
         cfg: Configuration object containing all settings.
-        root_dir: Optional root directory for data. If not provided, will use ROOT_DIR environment variable.
+        featurizer: BrainFeatureExtractor to preprocess raw iEEG data.
     """
 
-    def __init__(self, cfg: DictConfig):
+    def __init__(self, cfg: DictConfig, featurizer: BrainFeatureExtractor):
         super().__init__()
         self.cfg = cfg
 
         eval_subjects = Subjects(*cfg.eval_subjects)
         train_subjects = ~eval_subjects  # Use all subjects not in eval_subjects for training
 
-        self.train_ds = instantiate(cfg.train_ds, select=train_subjects)
-        self.eval_ds = instantiate(cfg.eval_ds, select=eval_subjects)
+        self.train_ds = CraneDataset(cfg.dataset_dir, featurizer=featurizer, select=train_subjects)
+        self.eval_ds = CraneDataset(cfg.dataset_dir, featurizer=featurizer, select=eval_subjects)
 
     def train_dataloader(self):
         """Returns the training dataloader."""
@@ -44,7 +44,6 @@ class DataModule(pl.LightningDataModule):
         val_sampler = DistributedStitchingFixedWindowSampler(
             sampling_intervals=self.eval_ds.get_sampling_intervals(),
             window_length=self.cfg.context_length,
-            step=self.cfg.eval_step_size,
             batch_size=self.cfg.dataloader.batch_size,
             num_replicas=self.trainer.world_size,
             rank=self.trainer.global_rank,

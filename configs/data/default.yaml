@@ -1,20 +1,12 @@
-batch_size: 128
 context_length: ${model.context_length}
 
 # Rest will be used for training. Pass a comma-separated list of subject IDs to use for evaluation.
 eval_subjects: [10]
-
-train_ds:
-  _target_: crane.data.CraneDataset
-  dataset_dir: ${oc.env:ROOT_DIR}/wang_barbu_braintreebank_2023
-
-eval_ds:
-  _target_: crane.data.CraneDataset
-  dataset_dir: ${oc.env:ROOT_DIR}/wang_barbu_braintreebank_2023
+dataset_dir: ${oc.env:ROOT_DIR}/wang_barbu_braintreebank_2023
 
 dataloader:
   pin_memory: true
-  batch_size: 128
+  batch_size: 32
   persistent_workers: true
   num_workers: 4
   prefetch_factor: 2

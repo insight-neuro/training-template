@@ -28,13 +28,13 @@ def train(cfg: DictConfig):
     cfg.seed = cfg.get("seed", 42)
     seed_everything(cfg.seed)
 
-    # Initialize data module
-    logger.info("Initializing data module...")
-    datamodule = DataModule(cfg.data)
-
     # Initialize featurizer
     logger.info("Setting up featurizer...")
     featurizer = instantiate(cfg.preprocess)
+
+    # Initialize data module
+    logger.info("Initializing data module...")
+    datamodule = DataModule(cfg.data, featurizer)
 
     # Initialize model
     logger.info("Initializing model...")
@@ -79,7 +79,7 @@ def train(cfg: DictConfig):
         logger.info("W&B logging disabled: (wandb not set in config.)")
 
     # Initialize Lightning module
-    module = BFMLightning(cfg, featurizer, model)
+    module = BFMLightning(cfg, model, output_dim=featurizer.feature_size)
     trainer = Trainer(
         callbacks=callbacks,
         logger=loggers,

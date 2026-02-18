@@ -1,5 +1,6 @@
 import torch
 from crane import BrainFeatureExtractor
+from crane.core.featurizer import BrainFeature
 from crane.preprocess import Spectrogram, laplacian_rereference, subset_electrodes
 from temporaldata import Data
 
@@ -26,7 +27,7 @@ class iEEGPreprocessor(BrainFeatureExtractor):
         self.rereference = rereference
         self.max_n_electrodes = max_n_electrodes
 
-    def forward(self, batch: Data) -> torch.Tensor:
+    def forward(self, batch: Data) -> BrainFeature:
         """
         Args:
             batch: Data object containing raw iEEG data
@@ -34,10 +35,14 @@ class iEEGPreprocessor(BrainFeatureExtractor):
         Returns:
             Spectrogram features: [batch_size, num_electrodes, num_timebins, n_freqs]
         """
-
-        ieeg, channels = batch.data, batch.channels.id  # type: ignore[attr-defined]
+        ieeg, channels = batch.data.data, batch.channels.id  # type: ignore[attr-defined]
+        sampling_rate = batch.data.sampling_rate  # type: ignore[attr-defined]
+        ieeg = torch.from_numpy(ieeg.T).float()
         if self.rereference:
-            ieeg, channels = laplacian_rereference(ieeg.data, channels)
+            ieeg, channels = laplacian_rereference(ieeg, channels)
         ieeg, _ = subset_electrodes(ieeg, channels, self.max_n_electrodes)
 
-        return self.spectrogram(ieeg, ieeg.sampling_rate)
+        # Add dummy batch dimension for spectrogram computation
+        ieeg = ieeg.unsqueeze(0)  # [1, num_electrodes, num_timepoints]
+        spec = self.spectrogram(ieeg, sampling_rate)  # [1, num_electrodes, num_timebins, n_freqs]
+        return BrainFeature(spec=spec.squeeze(0))  # [num_electrodes, num_timebins, n_freqs]

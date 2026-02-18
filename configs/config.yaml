@@ -1,5 +1,4 @@
 defaults:
-  - cluster: default
   - data: default
   - model: default
   - optim: adamw

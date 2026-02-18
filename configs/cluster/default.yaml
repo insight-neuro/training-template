@@ -1,7 +1,0 @@
-# @package cluster
-# Weights & Biases configuration
-wandb_project: ""
-wandb_entity: ""
-
-# Model saving and evaluation
-save_model_every_n_epochs: 1
