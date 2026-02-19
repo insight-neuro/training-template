@@ -45,7 +45,7 @@ class iEEGTransformer(BrainModel):
         """
         Args:
             x: [batch_size, num_electrodes, num_timesamples, num_frequencies]
-            
+
         Returns:
             BrainOutput containing the last hidden state of the transformer.
         """

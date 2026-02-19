@@ -39,6 +39,8 @@ def train(cfg: DictConfig):
     # Initialize model
     logger.info("Initializing model...")
     model = iEEGTransformer(cfg.model, input_dim=featurizer.feature_size)
+    model.train()
+    model.gradient_checkpointing_enable()
 
     # Count parameters
     n_params = sum(p.numel() for p in model.parameters())
@@ -51,7 +53,7 @@ def train(cfg: DictConfig):
         ModelCheckpoint(
             dirpath=f"{hydra_wd}/checkpoints",
             filename="{epoch:02d}-{val_loss:.4f}",
-            monitor="val_loss",
+            monitor="val/loss",
             mode="min",
             save_top_k=3,
             save_last=True,
