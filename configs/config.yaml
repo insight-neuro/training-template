@@ -8,13 +8,12 @@ defaults:
 
 seed: 42
 
-name: ${oc.env:SLURM_JOB_NAME}_${oc.env:SLURM_JOB_ID}
+name: ${oc.env:RUN_NAME,train}
 
 # Weights & Biases configuration
 wandb:
   name: ${name}
   project: "train-bfm"
-  entity: ""
 
 save_model_every_n_epochs: 1
 

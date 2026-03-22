@@ -1,6 +1,6 @@
 # Train Template
 
-This is a template repository for training machine learning models for neural data using PyTorch Lightning. It implements a simple next-token prediction model on the Braintree Bank dataset, allowing for easy customization and extension with a structured setup for data handling, model definition, and training processes. It uses Neural libraries such as [crane](https://github.com/insight-neuro/crane) and [torch brain](https://torchbrain.org/) to facilitate working with neural data and features.
+This is a template repository for training machine learning models for neural data using [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/). It implements a simple next-token prediction model on the Braintree Bank dataset, allowing for easy customization and extension with a structured setup for data handling, model definition, and training processes. It uses Neural libraries such as [crane](https://github.com/insight-neuro/crane) and [torch brain](https://torchbrain.org/) to facilitate working with neural data and features.
 
 ## Quick Start
 
@@ -41,5 +41,6 @@ This is a template repository for training machine learning models for neural da
   - `dataset.py`: Data loading and preprocessing. You can probably ignore this for now.
   - `train.py`: The main training script that orchestrates the training process.
 - `scripts/`: Scripts to run on a SLURM cluster. May need to be adjusted to your cluster configuration.
-   - `data.sh`: SLURM script to download and prepare the Braintree Bank dataset using `brainsets`.
+   - `data.sh`: SLURM script to download and prepare the [Braintree Bank](https://braintreebank.dev/) dataset using [brainsets](https://github.com/insight-neuro/brainsets).
    - `env.sh`: SLURM script to set up the environment for training jobs, including loading modules and activating virtual environments. Update this to fit your cluster's environment management.
+   - `train.sh`: SLURM script to run the training job. Adjust the resource requests and environment setup as needed for your cluster, and pass any necessary CLI overrides for the training script.
