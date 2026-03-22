@@ -4,7 +4,7 @@ transformer:
   n_layers: 5
 
 dropout: 0.1
-context_length: 3.0  # seconds
+context_length: ${data.context_length} 
 segment_length: ${preprocess.spectrogram.segment_length}
 p_overlap: ${preprocess.spectrogram.p_overlap}
 

@@ -66,7 +66,7 @@ def train(cfg: DictConfig):
     logger.info(f"CSV logging enabled: {hydra_wd}/logs/training_logs")
 
     # WandB Logger (optional)
-    if cfg.wandb and cfg.wandb.project and cfg.wandb.entity:
+    if cfg.wandb:
         wandb_logger = WandbLogger(
             save_dir=hydra_wd,
             config=OmegaConf.to_container(cfg, resolve=True),

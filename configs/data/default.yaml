@@ -1,4 +1,4 @@
-context_length: ${model.context_length}
+context_length: 3.0  # seconds
 
 # Rest will be used for training. Pass a comma-separated list of subject IDs to use for evaluation.
 eval_subjects: [10]
