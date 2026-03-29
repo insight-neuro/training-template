@@ -3,9 +3,10 @@ import math
 import numpy as np
 import torch
 import torch.nn as nn
-from crane import BrainModel
-from crane.core import BrainOutput
+from crane import BrainModel, BrainOutput
+from jaxtyping import Float
 from omegaconf import DictConfig
+from torch import Tensor
 from transformers import LlamaConfig, LlamaModel
 
 
@@ -41,7 +42,7 @@ class iEEGTransformer(BrainModel):
         # Task-specific head (e.g., classification, regression, etc.)
         self.output_head = nn.Linear(cfg.transformer.d_model, input_dim)
 
-    def forward(self, x: torch.Tensor) -> BrainOutput:
+    def forward(self, x: Float[Tensor, "batch_size num_electrodes num_timebins num_frequencies"]) -> BrainOutput:
         """
         Args:
             x: [batch_size, num_electrodes, num_timesamples, num_frequencies]
@@ -53,15 +54,26 @@ class iEEGTransformer(BrainModel):
 
         # Project signal values
         signal_emb = self.signal_projection(x)  # [batch_size, num_electrodes, num_timebins, d_model]
-        position_ids = torch.arange(num_timebins, device=signal_emb.device).unsqueeze(0).unsqueeze(0).expand(batch_size, num_electrodes, num_timebins)
+        position_ids = (
+            torch.arange(num_timebins, device=signal_emb.device)
+            .unsqueeze(0)
+            .unsqueeze(0)
+            .expand(batch_size, num_electrodes, num_timebins)
+        )
 
         # Flatten to [B, N*M, d_model] - attend across all electrode-time pairs
-        signal_emb = signal_emb.reshape(batch_size, num_electrodes * num_timebins, -1)  # [batch_size, num_electrodes * num_timebins, d_model]
+        signal_emb = signal_emb.reshape(
+            batch_size, num_electrodes * num_timebins, -1
+        )  # [batch_size, num_electrodes * num_timebins, d_model]
         position_ids = position_ids.reshape(batch_size, num_electrodes * num_timebins)
-        outputs = self.transformer(inputs_embeds=signal_emb, position_ids=position_ids)  # [batch_size, num_electrodes * num_timebins, d_model]
+        outputs = self.transformer(
+            inputs_embeds=signal_emb, position_ids=position_ids
+        )  # [batch_size, num_electrodes * num_timebins, d_model]
 
         # Get final representation
         hidden_states = outputs.last_hidden_state  # [batch_size, num_electrodes * num_timebins, d_model]
-        hidden_states = hidden_states.reshape(batch_size, num_electrodes, num_timebins, -1)  # [batch_size, num_electrodes, num_timebins, d_model]
+        hidden_states = hidden_states.reshape(
+            batch_size, num_electrodes, num_timebins, -1
+        )  # [batch_size, num_electrodes, num_timebins, d_model]
 
         return BrainOutput(last_hidden_state=hidden_states)

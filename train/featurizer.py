@@ -1,8 +1,12 @@
 import torch
-from crane import BrainFeatureExtractor
-from crane.core.featurizer import BrainFeature
+from crane import BrainFeature, BrainFeatureExtractor, CraneFeature
 from crane.preprocess import Spectrogram, laplacian_rereference, subset_electrodes
-from temporaldata import Data
+from jaxtyping import Float
+
+
+class SpectrogramFeature(BrainFeature):
+    signals: Float[torch.Tensor, "[batch_size] num_electrodes num_timebins n_freqs"]
+    """Spectrogram features computed from iEEG data, with shape (batch_size, num_electrodes, num_timebins, n_freqs)"""
 
 
 class iEEGPreprocessor(BrainFeatureExtractor):
@@ -27,7 +31,7 @@ class iEEGPreprocessor(BrainFeatureExtractor):
         self.rereference = rereference
         self.max_n_electrodes = max_n_electrodes
 
-    def forward(self, batch: Data) -> BrainFeature:
+    def forward(self, batch: CraneFeature) -> SpectrogramFeature:
         """
         Args:
             batch: Data object containing raw iEEG data
@@ -35,14 +39,13 @@ class iEEGPreprocessor(BrainFeatureExtractor):
         Returns:
             Spectrogram features: [batch_size, num_electrodes, num_timebins, n_freqs]
         """
-        ieeg, channels = batch.data.data, batch.channels.id  # type: ignore[attr-defined]
-        sampling_rate = batch.data.sampling_rate  # type: ignore[attr-defined]
-        ieeg = torch.from_numpy(ieeg.T).float()
+
         if self.rereference:
-            ieeg, channels = laplacian_rereference(ieeg, channels)
-        ieeg, _ = subset_electrodes(ieeg, channels, self.max_n_electrodes)
+            batch = laplacian_rereference(batch)
+        batch = subset_electrodes(batch, max_n_electrodes=self.max_n_electrodes)
 
         # Add dummy batch dimension for spectrogram computation
-        ieeg = ieeg.unsqueeze(0)  # [1, num_electrodes, num_timepoints]
-        spec = self.spectrogram(ieeg, sampling_rate)  # [1, num_electrodes, num_timebins, n_freqs]
-        return BrainFeature(spec=spec.squeeze(0))  # [num_electrodes, num_timebins, n_freqs]
+        signals = batch.signals.unsqueeze(0)  # [1, num_electrodes, num_timepoints]
+        spec = self.spectrogram(signals, batch.sampling_rate)  # [1, num_electrodes, num_timebins, n_freqs]
+
+        return SpectrogramFeature(signals=spec.squeeze(0))  # [num_electrodes, num_timebins, n_freqs]

@@ -31,7 +31,9 @@ class DataModule(pl.LightningDataModule):
 
     def train_dataloader(self):
         """Returns the training dataloader."""
-        train_sampler = RandomFixedWindowSampler(sampling_intervals=self.train_ds.get_sampling_intervals(), window_length=self.cfg.context_length)
+        train_sampler = RandomFixedWindowSampler(
+            sampling_intervals=self.train_ds.get_sampling_intervals(), window_length=self.cfg.context_length
+        )
 
         train_loader = DataLoader(self.train_ds, sampler=train_sampler, collate_fn=collate, **self.cfg.dataloader)
 
@@ -49,7 +51,9 @@ class DataModule(pl.LightningDataModule):
             rank=self.trainer.global_rank,
         )
 
-        val_loader = DataLoader(self.eval_ds, sampler=val_sampler, collate_fn=collate, **self.cfg.dataloader, shuffle=False, drop_last=False)
+        val_loader = DataLoader(
+            self.eval_ds, sampler=val_sampler, collate_fn=collate, **self.cfg.dataloader, shuffle=False, drop_last=False
+        )
 
         logger.info("Created validation dataloader with %d samples.", len(val_loader))
         return val_loader
